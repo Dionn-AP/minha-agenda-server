@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Users_1 = __importDefault(require("../models/Users"));
 const ConfirmPass_1 = __importDefault(require("../models/ConfirmPass"));
 const bcrypt = require('bcrypt');
-const smtp_1 = require("../config/smtp");
+const transporterMail = require("../config/smtp");
 class Usercontroller {
     createuser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -106,7 +106,6 @@ class Usercontroller {
             try {
                 const codeInitial = Math.round(Math.random() * 12345678);
                 let codeFinaly = codeInitial.toString().substring(0, 4);
-                console.log(codeFinaly);
                 const dataCode = {
                     name,
                     email,
@@ -122,8 +121,8 @@ class Usercontroller {
                 if (emailExist) {
                     yield ConfirmPass_1.default.deleteOne({ email: email });
                 }
-                const codeResponse = yield ConfirmPass_1.default.create(dataCode);
-                smtp_1.transporter.sendMail(dataEmail);
+                yield ConfirmPass_1.default.create(dataCode);
+                transporterMail.sendMail(dataEmail);
                 return res.status(201).json({ message: "Código enviado" });
             }
             catch (error) {

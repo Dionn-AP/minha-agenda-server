@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from '../models/Users';
 import ConfirmPass from "../models/ConfirmPass";
 const bcrypt = require('bcrypt');
-import { transporter } from "../config/smtp";
+const transporterMail = require("../config/smtp");
 
 
 class Usercontroller {
@@ -123,14 +123,13 @@ class Usercontroller {
         try {
             const codeInitial = Math.round(Math.random() * 12345678);
             let codeFinaly = codeInitial.toString().substring(0, 4);
-            console.log(codeFinaly)
 
             const dataCode = {
                 name,
                 email,
                 code: codeFinaly
             }
-            
+
             const dataEmail = {
                 from: 'Minha Agenda <nao-responder@minhaagenda.com.br>',
                 to: email,
@@ -144,8 +143,8 @@ class Usercontroller {
                 await ConfirmPass.deleteOne({ email: email });
             }
 
-            const codeResponse = await ConfirmPass.create(dataCode);
-            transporter.sendMail(dataEmail);
+            await ConfirmPass.create(dataCode);
+            transporterMail.sendMail(dataEmail);
 
             return res.status(201).json({ message: "Código enviado" });
         } catch (error: any) {
