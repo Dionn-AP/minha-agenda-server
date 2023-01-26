@@ -16,6 +16,8 @@ app.use(express.json());
 
 app.use(routes);
 
+mongoose.set('strictQuery', false)
+
 mongoose.connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jdvevpy.mongodb.net/bancodaapi?retryWrites=true&w=majority`
 )
