@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from '../models/Users';
 import ConfirmPass from "../models/ConfirmPass";
+import Companies_Service from "../models/Companies_Service";
 const bcrypt = require('bcrypt');
 const transporterMail = require("../config/smtp");
 
@@ -28,7 +29,7 @@ class Usercontroller {
         const userExists = await User.findOne({ email: email });
 
         if (userExists) {
-            return res.status(422).json({ message: "Por favor, utilize outro e-mail." });
+            return res.status(422).json({ message: "Por favor, utilize outro e-mail" });
         }
 
         const salt = await bcrypt.genSalt(12);
@@ -59,7 +60,7 @@ class Usercontroller {
                 return res.status(201).json({ message: "Cadastro concluído com sucesso!" });
             }
         } catch (error) {
-            return res.status(500).json(error);
+            return res.status(404).json(error);
         }
     }
 
@@ -149,6 +150,33 @@ class Usercontroller {
             return res.status(201).json({ message: "Código enviado" });
         } catch (error: any) {
             console.log(error.response.data)
+            return res.status(422).json(error);
+        }
+    }
+
+    async favoritecompany(req: Request, res: Response) {
+        const idUser = req.userId;
+        const { id } = req.params;
+        
+        try {
+            const company = await Companies_Service.findById({ _id: id });
+            
+            const isFavorite = company?.id_favorite.findIndex((favorite => {
+                return favorite === idUser
+            }));
+
+            if(isFavorite! >= 0) {
+                company?.id_favorite.splice(isFavorite!, 1);
+                await Companies_Service.updateOne({_id: id}, {id_favorite: company?.id_favorite});
+                return res.status(201).json({ message: `${company?.name} não favoritada` });
+                
+            } else {
+                company?.id_favorite.push(idUser);
+                await Companies_Service.updateOne({_id: id}, {id_favorite: company?.id_favorite});
+                return res.status(201).json({ message: `${company?.name} favoritada com sucesso` });
+            }
+
+        } catch (error: any) {
             return res.status(422).json(error);
         }
     }
