@@ -41,16 +41,22 @@ class Usercontroller {
                 post: post ? post : "",
                 number_address: number_address ? number_address : null,
                 city: city ? city : "",
-                state: state ? state : ""
+                state: state ? state : "",
+                code
             };
             try {
                 const codePass = yield ConfirmPass_1.default.findOne({ email: email });
+                const dataCreated = new Date(codePass === null || codePass === void 0 ? void 0 : codePass.createdAt).getMinutes();
+                const dataNow = new Date().getMinutes();
                 if ((codePass === null || codePass === void 0 ? void 0 : codePass.code) !== code) {
                     return res.status(422).json({ message: "O código informado está incorreto" });
                 }
+                if ((dataNow - dataCreated) > 2) {
+                    return res.status(422).json({ message: "O código expirou. Reenvie para obter um novo código de confirmação" });
+                }
                 if ((codePass === null || codePass === void 0 ? void 0 : codePass.code) === code) {
                     const newUser = yield Users_1.default.create(dataUser);
-                    return res.status(201).json({ message: "Cadastro concluído com sucesso!" });
+                    return res.status(201).json({ message: "Cadastro concluído com sucesso" });
                 }
             }
             catch (error) {
