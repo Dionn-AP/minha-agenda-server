@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const mongoose_2 = __importDefault(require("mongoose"));
-const Schedules = new mongoose_1.Schema({
+const Companies = new mongoose_1.Schema({
     name: String,
     email: String,
     address: {
@@ -22,7 +22,8 @@ const Schedules = new mongoose_1.Schema({
         lati: String,
         long: String,
     },
+    service_tags: [String],
     open_schedules: Boolean,
     id_favorite: [String]
 }, { timestamps: true });
-exports.default = mongoose_2.default.model('Schedules', Schedules);
+exports.default = mongoose_2.default.model('Companies', Companies);

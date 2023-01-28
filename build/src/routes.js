@@ -17,6 +17,7 @@ router.post('/login', login_1.default.authenticate);
 //companies
 router.post('/company', companies_1.default.createcompany);
 router.get('/companies', companies_1.default.companies);
+router.get('/search-companies', companies_1.default.searchcompanies);
 //authenticated
 router.get('/user', middlewareLogin_1.default, user_1.default.user);
 router.patch('/user', middlewareLogin_1.default, user_1.default.update);

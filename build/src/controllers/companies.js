@@ -16,11 +16,11 @@ const Companies_Service_1 = __importDefault(require("../models/Companies_Service
 class Companiescontroller {
     createcompany(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, email, address: { phone, road, district, complement, post, number_address, city, state, }, location: { lati, long, }, open_schedules } = req.body;
+            const { name, email, address: { phone, road, district, complement, post, number_address, city, state }, location: { lati, long, }, service_tags, open_schedules } = req.body;
             if (!name || !email || !phone
                 || !road || !district
                 || !number_address || !city
-                || !state) {
+                || !state || !service_tags.length || !open_schedules) {
                 return res.status(422).json({ message: 'Você precisa preencher todos os campos obrigatórios' });
             }
             const companyExists = yield Companies_Service_1.default.findOne({ email: email });
@@ -44,6 +44,7 @@ class Companiescontroller {
                     lati: lati ? lati : "",
                     long: long ? long : ""
                 },
+                service_tags: service_tags,
                 open_schedules,
                 id_favorite: []
             };
@@ -73,12 +74,19 @@ class Companiescontroller {
             }
         });
     }
-    favoritecompany(req, res) {
+    searchcompanies(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const idUser = req.userId;
+            const { name } = req.query;
+            const rgx = (pattern) => new RegExp(`.*${pattern}.*`);
+            const searchRgx = rgx(name);
             try {
-                const favorite = Companies_Service_1.default.exists({ id_favorite: idUser });
-                console.log(favorite);
+                const finded = yield Companies_Service_1.default.find({
+                    $or: [
+                        { name: { $regex: searchRgx, $options: 'i' } },
+                        { service_types: { $regex: searchRgx, $options: 'i' } }
+                    ]
+                });
+                return res.status(200).json(finded);
             }
             catch (error) {
                 return res.status(422).json(error);
