@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
-const Schedules = new Schema({
+const Companies = new Schema({
     name: String,
     email: String,
     address: {
@@ -18,8 +18,9 @@ const Schedules = new Schema({
         lati: String,
         long: String,
     },
+    service_tags: [String],
     open_schedules: Boolean,
     id_favorite: [String]
 }, { timestamps: true });
 
-export default mongoose.model('Schedules', Schedules);
+export default mongoose.model('Companies', Companies);
