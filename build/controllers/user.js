@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Users_1 = __importDefault(require("../models/Users"));
 const ConfirmPass_1 = __importDefault(require("../models/ConfirmPass"));
+const Companies_Service_1 = __importDefault(require("../models/Companies_Service"));
 const bcrypt = require('bcrypt');
 const transporterMail = require("../config/smtp");
 class Usercontroller {
@@ -25,7 +26,7 @@ class Usercontroller {
             }
             const userExists = yield Users_1.default.findOne({ email: email });
             if (userExists) {
-                return res.status(422).json({ message: "Por favor, utilize outro e-mail." });
+                return res.status(422).json({ message: "Por favor, utilize outro e-mail" });
             }
             const salt = yield bcrypt.genSalt(12);
             const passwordHash = yield bcrypt.hash(password, salt);
@@ -40,20 +41,26 @@ class Usercontroller {
                 post: post ? post : "",
                 number_address: number_address ? number_address : null,
                 city: city ? city : "",
-                state: state ? state : ""
+                state: state ? state : "",
+                code
             };
             try {
                 const codePass = yield ConfirmPass_1.default.findOne({ email: email });
+                const dataCreated = new Date(codePass === null || codePass === void 0 ? void 0 : codePass.createdAt).getMinutes();
+                const dataNow = new Date().getMinutes();
                 if ((codePass === null || codePass === void 0 ? void 0 : codePass.code) !== code) {
                     return res.status(422).json({ message: "O código informado está incorreto" });
                 }
+                if ((dataNow - dataCreated) > 5) {
+                    return res.status(422).json({ message: "O código expirou. Reenvie para obter um novo código de confirmação" });
+                }
                 if ((codePass === null || codePass === void 0 ? void 0 : codePass.code) === code) {
                     const newUser = yield Users_1.default.create(dataUser);
-                    return res.status(201).json({ message: "Cadastro concluído com sucesso!" });
+                    return res.status(201).json({ message: "Cadastro concluído com sucesso" });
                 }
             }
             catch (error) {
-                return res.status(500).json(error);
+                return res.status(404).json(error);
             }
         });
     }
@@ -127,6 +134,31 @@ class Usercontroller {
             }
             catch (error) {
                 console.log(error.response.data);
+                return res.status(422).json(error);
+            }
+        });
+    }
+    favoritecompany(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const idUser = req.userId;
+            const { id } = req.params;
+            try {
+                const company = yield Companies_Service_1.default.findById({ _id: id });
+                const isFavorite = company === null || company === void 0 ? void 0 : company.id_favorite.findIndex((favorite => {
+                    return favorite === idUser;
+                }));
+                if (isFavorite >= 0) {
+                    company === null || company === void 0 ? void 0 : company.id_favorite.splice(isFavorite, 1);
+                    yield Companies_Service_1.default.updateOne({ _id: id }, { id_favorite: company === null || company === void 0 ? void 0 : company.id_favorite });
+                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.name} não favoritada` });
+                }
+                else {
+                    company === null || company === void 0 ? void 0 : company.id_favorite.push(idUser);
+                    yield Companies_Service_1.default.updateOne({ _id: id }, { id_favorite: company === null || company === void 0 ? void 0 : company.id_favorite });
+                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.name} favoritada com sucesso` });
+                }
+            }
+            catch (error) {
                 return res.status(422).json(error);
             }
         });

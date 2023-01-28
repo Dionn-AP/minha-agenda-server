@@ -13,6 +13,7 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 app.use(routes_1.default);
+mongoose_1.default.set('strictQuery', false);
 mongoose_1.default.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jdvevpy.mongodb.net/bancodaapi?retryWrites=true&w=majority`)
     .then(() => {
     console.log('Conectado ao MongoDB!');
