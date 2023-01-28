@@ -14,19 +14,20 @@ class Companiescontroller {
                 post,
                 number_address,
                 city,
-                state,
+                state
             },
             location: {
                 lati,
                 long,
             },
+            service_tags,
             open_schedules
         } = req.body;
 
         if (!name || !email || !phone
             || !road || !district
             || !number_address || !city
-            || !state) {
+            || !state || !service_tags.length || !open_schedules) {
             return res.status(422).json({ message: 'Você precisa preencher todos os campos obrigatórios' });
         }
 
@@ -43,7 +44,7 @@ class Companiescontroller {
                 phone,
                 road,
                 district,
-                complement: complement ? complement: "",
+                complement: complement ? complement : "",
                 post: post ? post : "",
                 number_address,
                 city,
@@ -53,6 +54,7 @@ class Companiescontroller {
                 lati: lati ? lati : "",
                 long: long ? long : ""
             },
+            service_tags: service_tags,
             open_schedules,
             id_favorite: []
         }
@@ -74,7 +76,7 @@ class Companiescontroller {
                 return company.open_schedules === true
             }))
 
-            if(!companiesOpenSchedules?.length) {
+            if (!companiesOpenSchedules?.length) {
                 return res.status(200).json({ message: "Nenhum empresa ou serviço encontrados" });
             }
 
@@ -84,12 +86,18 @@ class Companiescontroller {
         }
     }
 
-    async favoritecompany(req: Request, res: Response) {
-        const idUser = req.userId;
-        
+    async searchcompanies(req: Request, res: Response) {
+        const { name } = req.query;
+        const rgx = (pattern: any) => new RegExp(`.*${pattern}.*`);
+        const searchRgx = rgx(name);
         try {
-            const favorite = Companies_Service.exists({id_favorite: idUser});
-            console.log(favorite)
+            const finded = await Companies_Service.find({
+                $or: [
+                    { name: { $regex: searchRgx, $options: 'i' } },
+                    { service_types: { $regex: searchRgx, $options: 'i' } }
+                ]
+            })
+            return res.status(200).json(finded);
 
         } catch (error: any) {
             return res.status(422).json(error);
