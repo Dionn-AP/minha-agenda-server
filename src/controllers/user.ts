@@ -46,18 +46,27 @@ class Usercontroller {
             post: post ? post : "",
             number_address: number_address ? number_address : null,
             city: city ? city : "",
-            state: state ? state : ""
+            state: state ? state : "",
+            code
         }
 
         try {
             const codePass = await ConfirmPass.findOne({ email: email });
 
+            const dataCreated = new Date(codePass?.createdAt!).getMinutes();
+            const dataNow = new Date().getMinutes();
+
             if (codePass?.code !== code) {
                 return res.status(422).json({ message: "O código informado está incorreto" });
             }
+
+            if ((dataNow - dataCreated) > 5) {
+                return res.status(422).json({ message: "O código expirou. Reenvie para obter um novo código de confirmação" });
+            }
+
             if (codePass?.code === code) {
                 const newUser = await User.create(dataUser);
-                return res.status(201).json({ message: "Cadastro concluído com sucesso!" });
+                return res.status(201).json({ message: "Cadastro concluído com sucesso" });
             }
         } catch (error) {
             return res.status(404).json(error);
@@ -157,22 +166,22 @@ class Usercontroller {
     async favoritecompany(req: Request, res: Response) {
         const idUser = req.userId;
         const { id } = req.params;
-        
+
         try {
             const company = await Companies_Service.findById({ _id: id });
-            
+
             const isFavorite = company?.id_favorite.findIndex((favorite => {
                 return favorite === idUser
             }));
 
-            if(isFavorite! >= 0) {
+            if (isFavorite! >= 0) {
                 company?.id_favorite.splice(isFavorite!, 1);
-                await Companies_Service.updateOne({_id: id}, {id_favorite: company?.id_favorite});
+                await Companies_Service.updateOne({ _id: id }, { id_favorite: company?.id_favorite });
                 return res.status(201).json({ message: `${company?.name} não favoritada` });
-                
+
             } else {
                 company?.id_favorite.push(idUser);
-                await Companies_Service.updateOne({_id: id}, {id_favorite: company?.id_favorite});
+                await Companies_Service.updateOne({ _id: id }, { id_favorite: company?.id_favorite });
                 return res.status(201).json({ message: `${company?.name} favoritada com sucesso` });
             }
 
