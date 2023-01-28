@@ -16,6 +16,7 @@ router.post('/login', Login.authenticate);
 //companies
 router.post('/company', Companiescontroller.createcompany);
 router.get('/companies', Companiescontroller.companies);
+router.get('/search-companies', Companiescontroller.searchcompanies);
 
 //authenticated
 router.get('/user', authMiddleware, Usercontroller.user);
