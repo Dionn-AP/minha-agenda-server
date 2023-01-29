@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import Companies_Service from "../models/Companies_Service";
 
-class Companiescontroller {
+class CompaniesController {
     async createcompany(req: Request, res: Response) {
         const {
-            name,
+            company,
+            name_owner,
             email,
             address: {
                 phone,
@@ -24,7 +25,7 @@ class Companiescontroller {
             open_schedules
         } = req.body;
 
-        if (!name || !email || !phone
+        if (!company || !name_owner || !email || !phone
             || !road || !district
             || !number_address || !city
             || !state || !service_tags.length || !open_schedules) {
@@ -38,7 +39,8 @@ class Companiescontroller {
         }
 
         const dataComapny = {
-            name,
+            company,
+            name_owner,
             email,
             address: {
                 phone,
@@ -103,6 +105,75 @@ class Companiescontroller {
             return res.status(422).json(error);
         }
     }
+
+    async updatecompany(req: Request, res: Response) {
+        const { id } = req.params;
+        const {
+            company,
+            name_owner,
+            email,
+            address: {
+                phone,
+                road,
+                district,
+                complement,
+                post,
+                number_address,
+                city,
+                state
+            },
+            location: {
+                lati,
+                long,
+            },
+            service_tags,
+            open_schedules
+        } = req.body;
+
+        const currentCompany = await Companies_Service.findById({ _id: id });
+
+        if (!currentCompany) {
+            return res.status(404).json({ message: "Não foi possível localizar os dados da empresa" });
+        }
+
+        if(service_tags.length > 0) {
+            currentCompany?.service_tags.push(...service_tags);
+        }
+
+        const dataComapny = {
+            company: company ? company: currentCompany?.company,
+            name_owner: name_owner ? name_owner : currentCompany?.name_owner,
+            email: email ? email : currentCompany?.email,
+            address: {
+                phone: phone ? phone : currentCompany?.address?.phone,
+                road: road ? road : currentCompany?.address?.road,
+                district: district ? district : currentCompany?.address?.district,
+                complement: complement ? complement : currentCompany?.address?.complement,
+                post: post ? post : currentCompany?.address?.post,
+                number_address: number_address ? number_address : currentCompany?.address?.number_address,
+                city: city ? city : currentCompany?.address?.city,
+                state: state ? state : currentCompany?.address?.state,
+            },
+            location: {
+                lati: lati ? lati : currentCompany?.location?.lati,
+                long: long ? long : currentCompany?.location?.long
+            },
+            service_tags: currentCompany?.service_tags,
+            open_schedules: open_schedules ? open_schedules : currentCompany?.open_schedules
+        }
+
+        try {
+            const updatedCompany = await Companies_Service.updateOne({_id: id}, dataComapny);
+
+            if (updatedCompany.matchedCount === 0) {
+                return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+            }
+
+            res.status(200).json(dataComapny);
+        } catch (error) {
+
+        }
+    }
 }
 
-export default new Companiescontroller();
+export default new CompaniesController();
