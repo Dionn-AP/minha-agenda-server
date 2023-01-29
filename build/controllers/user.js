@@ -98,7 +98,7 @@ class Usercontroller {
             try {
                 const updatedUser = yield Users_1.default.updateOne({ _id: id }, user);
                 if (updatedUser.matchedCount === 0) {
-                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado!' });
+                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
                 }
                 res.status(200).json(user);
             }
@@ -150,12 +150,12 @@ class Usercontroller {
                 if (isFavorite >= 0) {
                     company === null || company === void 0 ? void 0 : company.id_favorite.splice(isFavorite, 1);
                     yield Companies_Service_1.default.updateOne({ _id: id }, { id_favorite: company === null || company === void 0 ? void 0 : company.id_favorite });
-                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.name} não favoritada` });
+                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.company} não favoritada` });
                 }
                 else {
                     company === null || company === void 0 ? void 0 : company.id_favorite.push(idUser);
                     yield Companies_Service_1.default.updateOne({ _id: id }, { id_favorite: company === null || company === void 0 ? void 0 : company.id_favorite });
-                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.name} favoritada com sucesso` });
+                    return res.status(201).json({ message: `${company === null || company === void 0 ? void 0 : company.company} favoritada com sucesso` });
                 }
             }
             catch (error) {

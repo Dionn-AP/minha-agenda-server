@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const mongoose_2 = __importDefault(require("mongoose"));
 const Companies = new mongoose_1.Schema({
-    name: String,
+    company: String,
+    name_owner: String,
     email: String,
     address: {
         phone: String,

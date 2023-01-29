@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Companies_Service_1 = __importDefault(require("../models/Companies_Service"));
-class Companiescontroller {
+class CompaniesController {
     createcompany(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, email, address: { phone, road, district, complement, post, number_address, city, state }, location: { lati, long, }, service_tags, open_schedules } = req.body;
-            if (!name || !email || !phone
+            const { company, name_owner, email, address: { phone, road, district, complement, post, number_address, city, state }, location: { lati, long, }, service_tags, open_schedules } = req.body;
+            if (!company || !name_owner || !email || !phone
                 || !road || !district
                 || !number_address || !city
                 || !state || !service_tags.length || !open_schedules) {
@@ -28,7 +28,8 @@ class Companiescontroller {
                 return res.status(422).json({ message: "Essa empressa ou serviço ja estão cadastrados" });
             }
             const dataComapny = {
-                name,
+                company,
+                name_owner,
                 email,
                 address: {
                     phone,
@@ -93,5 +94,49 @@ class Companiescontroller {
             }
         });
     }
+    updatecompany(req, res) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { company, name_owner, email, address: { phone, road, district, complement, post, number_address, city, state }, location: { lati, long, }, service_tags, open_schedules } = req.body;
+            const currentCompany = yield Companies_Service_1.default.findById({ _id: id });
+            if (!currentCompany) {
+                return res.status(404).json({ message: "Não foi possível localizar os dados da empresa" });
+            }
+            if (service_tags.length > 0) {
+                currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.service_tags.push(...service_tags);
+            }
+            const dataComapny = {
+                company: company ? company : currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.company,
+                name_owner: name_owner ? name_owner : currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.name_owner,
+                email: email ? email : currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.email,
+                address: {
+                    phone: phone ? phone : (_a = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _a === void 0 ? void 0 : _a.phone,
+                    road: road ? road : (_b = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _b === void 0 ? void 0 : _b.road,
+                    district: district ? district : (_c = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _c === void 0 ? void 0 : _c.district,
+                    complement: complement ? complement : (_d = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _d === void 0 ? void 0 : _d.complement,
+                    post: post ? post : (_e = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _e === void 0 ? void 0 : _e.post,
+                    number_address: number_address ? number_address : (_f = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _f === void 0 ? void 0 : _f.number_address,
+                    city: city ? city : (_g = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _g === void 0 ? void 0 : _g.city,
+                    state: state ? state : (_h = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.address) === null || _h === void 0 ? void 0 : _h.state,
+                },
+                location: {
+                    lati: lati ? lati : (_j = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.location) === null || _j === void 0 ? void 0 : _j.lati,
+                    long: long ? long : (_k = currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.location) === null || _k === void 0 ? void 0 : _k.long
+                },
+                service_tags: currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.service_tags,
+                open_schedules: open_schedules ? open_schedules : currentCompany === null || currentCompany === void 0 ? void 0 : currentCompany.open_schedules
+            };
+            try {
+                const updatedCompany = yield Companies_Service_1.default.updateOne({ _id: id }, dataComapny);
+                if (updatedCompany.matchedCount === 0) {
+                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+                }
+                res.status(200).json(dataComapny);
+            }
+            catch (error) {
+            }
+        });
+    }
 }
-exports.default = new Companiescontroller();
+exports.default = new CompaniesController();
