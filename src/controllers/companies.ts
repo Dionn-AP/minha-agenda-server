@@ -92,13 +92,15 @@ class CompaniesController {
         const { name } = req.query;
         const rgx = (pattern: any) => new RegExp(`.*${pattern}.*`);
         const searchRgx = rgx(name);
+        
         try {
             const finded = await Companies_Service.find({
                 $or: [
                     { name: { $regex: searchRgx, $options: 'i' } },
-                    { service_types: { $regex: searchRgx, $options: 'i' } }
+                    { service_tags: { $regex: searchRgx, $options: 'i' } }
                 ]
             })
+            console.log(finded)
             return res.status(200).json(finded);
 
         } catch (error: any) {
