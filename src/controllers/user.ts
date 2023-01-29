@@ -88,6 +88,7 @@ class Usercontroller {
             return res.status(422).json(error);
         }
     }
+    
     async update(req: Request, res: Response) {
         const id = req.userId;
         const {
@@ -119,7 +120,7 @@ class Usercontroller {
             const updatedUser = await User.updateOne({ _id: id }, user);
 
             if (updatedUser.matchedCount === 0) {
-                return res.status(422).json({ message: 'Nenhuma dado foi atualizado!' });
+                return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
             }
 
             res.status(200).json(user);
@@ -127,6 +128,7 @@ class Usercontroller {
             return res.status(500).json(error);
         }
     }
+
     async sendemail(req: Request, res: Response) {
         const { name, email } = req.body;
 
@@ -177,12 +179,12 @@ class Usercontroller {
             if (isFavorite! >= 0) {
                 company?.id_favorite.splice(isFavorite!, 1);
                 await Companies_Service.updateOne({ _id: id }, { id_favorite: company?.id_favorite });
-                return res.status(201).json({ message: `${company?.name} não favoritada` });
+                return res.status(201).json({ message: `${company?.company} não favoritada` });
 
             } else {
                 company?.id_favorite.push(idUser);
                 await Companies_Service.updateOne({ _id: id }, { id_favorite: company?.id_favorite });
-                return res.status(201).json({ message: `${company?.name} favoritada com sucesso` });
+                return res.status(201).json({ message: `${company?.company} favoritada com sucesso` });
             }
 
         } catch (error: any) {
