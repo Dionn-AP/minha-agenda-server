@@ -84,9 +84,10 @@ class CompaniesController {
                 const finded = yield Companies_Service_1.default.find({
                     $or: [
                         { name: { $regex: searchRgx, $options: 'i' } },
-                        { service_types: { $regex: searchRgx, $options: 'i' } }
+                        { service_tags: { $regex: searchRgx, $options: 'i' } }
                     ]
                 });
+                console.log(finded);
                 return res.status(200).json(finded);
             }
             catch (error) {
