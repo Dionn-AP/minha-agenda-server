@@ -2,7 +2,8 @@ import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
 const Companies = new Schema({
-    name: String,
+    company: String,
+    name_owner: String,
     email: String,
     address: {
         phone: String,
