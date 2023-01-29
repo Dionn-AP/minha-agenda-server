@@ -96,11 +96,10 @@ class CompaniesController {
         try {
             const finded = await Companies_Service.find({
                 $or: [
-                    { name: { $regex: searchRgx, $options: 'i' } },
+                    { company: { $regex: searchRgx, $options: 'i' } },
                     { service_tags: { $regex: searchRgx, $options: 'i' } }
                 ]
             })
-            console.log(finded)
             return res.status(200).json(finded);
 
         } catch (error: any) {
