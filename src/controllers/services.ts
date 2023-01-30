@@ -29,7 +29,7 @@ class ServicesController {
         try {
             const servicesCreated = await Services.create(dataServices);
 
-            return res.status(201).json(servicesCreated);
+            return res.status(201).json({message: "Serviços cadastrados com sucesso"});
 
         } catch (error: any) {
             return res.status(422).json(error);
@@ -67,6 +67,27 @@ class ServicesController {
             await Services.updateOne({ _id: id }, services);
 
             return res.status(201).json({ message: "Serviços adicionados com sucesso" });
+        } catch (error: any) {
+            return res.status(422).json(error);
+        }
+    }
+
+    async getservices(req: Request, res: Response) {
+        const { id } = req.params;
+
+        if(!id) {
+            return res.status(404).json({ message: "Não foi possível localizar os dados da empresa" });
+        }
+
+        try {
+            const service = await Services.findOne({company_id: id});
+
+            if(!service) {
+                return res.status(404).json({ message: "Não foi possível carregar os dados da empresa" });
+            }
+            
+            return res.status(200).json(service);
+
         } catch (error: any) {
             return res.status(422).json(error);
         }
