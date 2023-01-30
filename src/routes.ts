@@ -21,6 +21,7 @@ router.post('/company', CompaniesController.createcompany);
 router.patch('/company/:id', CompaniesController.updatecompany);
 
 //sercives
+router.get('/services/:id', ServicesController.getservices);
 router.post('/services', ServicesController.servicescompanies);
 router.patch('/add-services/:id', ServicesController.addservices);
 
