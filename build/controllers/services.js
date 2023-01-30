@@ -35,7 +35,7 @@ class ServicesController {
             };
             try {
                 const servicesCreated = yield Services_1.default.create(dataServices);
-                return res.status(201).json(servicesCreated);
+                return res.status(201).json({ message: "Serviços cadastrados com sucesso" });
             }
             catch (error) {
                 return res.status(422).json(error);
@@ -66,6 +66,24 @@ class ServicesController {
                 }
                 yield Services_1.default.updateOne({ _id: id }, services);
                 return res.status(201).json({ message: "Serviços adicionados com sucesso" });
+            }
+            catch (error) {
+                return res.status(422).json(error);
+            }
+        });
+    }
+    getservices(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            if (!id) {
+                return res.status(404).json({ message: "Não foi possível localizar os dados da empresa" });
+            }
+            try {
+                const service = yield Services_1.default.findOne({ company_id: id });
+                if (!service) {
+                    return res.status(404).json({ message: "Não foi possível carregar os dados da empresa" });
+                }
+                return res.status(200).json(service);
             }
             catch (error) {
                 return res.status(422).json(error);

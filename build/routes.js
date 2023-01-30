@@ -21,6 +21,7 @@ router.get('/search-companies', companies_1.default.searchcompanies);
 router.post('/company', companies_1.default.createcompany);
 router.patch('/company/:id', companies_1.default.updatecompany);
 //sercives
+router.get('/services/:id', services_1.default.getservices);
 router.post('/services', services_1.default.servicescompanies);
 router.patch('/add-services/:id', services_1.default.addservices);
 //routes authenticated
