@@ -24,6 +24,7 @@ router.patch('/company/:id', CompaniesController.updatecompany);
 router.get('/services/:id', ServicesController.getservices);
 router.post('/services', ServicesController.servicescompanies);
 router.patch('/add-services/:id', ServicesController.addservices);
+router.patch('/updated-services-available', ServicesController.updatedservices);
 
 //routes authenticated
 router.get('/user', authMiddleware, Usercontroller.user);

@@ -92,6 +92,66 @@ class ServicesController {
             return res.status(422).json(error);
         }
     }
+
+    async updatedservices(req: Request, res: Response) {
+        const { id_service } = req.query;
+        const { name_service, price, available, id } = req.body;
+
+        const services = await Services.findById({ _id: id_service });
+
+        if (!services) {
+            return res.status(404).json({ message: "Não foi possível carregar os dados da empresa" });
+        }
+
+        if(!id) {
+            return res.status(404).json({ message: "Não foi possível carregar os dados do(s) serviço(s) selecionado(s)" });
+        }
+
+        try {
+
+            const indexServiceType = services?.service_types.findIndex((service: { _id: string }) => {
+                return service._id.toString() === `${id}`
+            });
+
+            if (indexServiceType === -1) {
+                return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+            }
+
+            if (indexServiceType >= 0 && available && !name_service && !price) {
+                services?.service_types.splice(indexServiceType, 1, {
+                    name_service: services?.service_types[indexServiceType].name_service,
+                    price: services?.service_types[indexServiceType].price,
+                    available: !services?.service_types[indexServiceType].available,
+                    _id: id
+                });
+
+                const serviceUpdated = await Services.updateOne({ _id: id_service }, { service_types: services?.service_types });
+
+                if (serviceUpdated.matchedCount === 0) {
+                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+                }
+            }
+
+            if (indexServiceType >= 0) {
+                services?.service_types.splice(indexServiceType, 1, {
+                    name_service: name_service ? name_service : services?.service_types[indexServiceType].name_service,
+                    price: price ? price : services?.service_types[indexServiceType].price,
+                    available: available ? available : services?.service_types[indexServiceType].available,
+                    _id: id
+                });
+            }
+
+            const serviceUpdated = await Services.updateOne({ _id: id_service }, { service_types: services?.service_types });
+
+            if (serviceUpdated.matchedCount === 0) {
+                return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+            }
+
+            return res.status(200).json(services);
+        } catch (error) {
+            return res.status(422).json(error);
+        }
+    }
 }
 
 export default new ServicesController();
