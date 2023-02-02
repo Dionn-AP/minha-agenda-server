@@ -90,5 +90,54 @@ class ServicesController {
             }
         });
     }
+    updatedservices(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_service } = req.query;
+            const { name_service, price, available, id } = req.body;
+            const services = yield Services_1.default.findById({ _id: id_service });
+            if (!services) {
+                return res.status(404).json({ message: "Não foi possível carregar os dados da empresa" });
+            }
+            if (!id) {
+                return res.status(404).json({ message: "Não foi possível carregar os dados do(s) serviço(s) selecionado(s)" });
+            }
+            try {
+                const indexServiceType = services === null || services === void 0 ? void 0 : services.service_types.findIndex((service) => {
+                    return service._id.toString() === `${id}`;
+                });
+                if (indexServiceType === -1) {
+                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+                }
+                if (indexServiceType >= 0 && available && !name_service && !price) {
+                    services === null || services === void 0 ? void 0 : services.service_types.splice(indexServiceType, 1, {
+                        name_service: services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].name_service,
+                        price: services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].price,
+                        available: !(services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].available),
+                        _id: id
+                    });
+                    const serviceUpdated = yield Services_1.default.updateOne({ _id: id_service }, { service_types: services === null || services === void 0 ? void 0 : services.service_types });
+                    if (serviceUpdated.matchedCount === 0) {
+                        return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+                    }
+                }
+                if (indexServiceType >= 0) {
+                    services === null || services === void 0 ? void 0 : services.service_types.splice(indexServiceType, 1, {
+                        name_service: name_service ? name_service : services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].name_service,
+                        price: price ? price : services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].price,
+                        available: available ? available : services === null || services === void 0 ? void 0 : services.service_types[indexServiceType].available,
+                        _id: id
+                    });
+                }
+                const serviceUpdated = yield Services_1.default.updateOne({ _id: id_service }, { service_types: services === null || services === void 0 ? void 0 : services.service_types });
+                if (serviceUpdated.matchedCount === 0) {
+                    return res.status(422).json({ message: 'Nenhuma dado foi atualizado' });
+                }
+                return res.status(200).json(services);
+            }
+            catch (error) {
+                return res.status(422).json(error);
+            }
+        });
+    }
 }
 exports.default = new ServicesController();

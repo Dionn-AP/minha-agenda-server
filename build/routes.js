@@ -24,6 +24,7 @@ router.patch('/company/:id', companies_1.default.updatecompany);
 router.get('/services/:id', services_1.default.getservices);
 router.post('/services', services_1.default.servicescompanies);
 router.patch('/add-services/:id', services_1.default.addservices);
+router.patch('/updated-services-available', services_1.default.updatedservices);
 //routes authenticated
 router.get('/user', middlewareLogin_1.default, user_1.default.user);
 router.post('/user/discover-password', middlewareLogin_1.default, passwords_1.default.getPassword);
